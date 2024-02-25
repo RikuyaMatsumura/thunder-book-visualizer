@@ -35,7 +35,7 @@ watch_path = ["src", "public"]
 [web.resource]
 
 # CSS style file
-style = ["/thunder-book-visualizer/docs/tailwind.css"]
+style = ["./tailwind.css"]
 
 # Javascript code file
 script = []
