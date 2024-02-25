@@ -7,8 +7,8 @@ name = "Tailwind CSS + Dioxus"
 # desktop, web, mobile, ssr
 default_platform = "web"
 
-# `build` & `serve` dist path
-out_dir = "dist"
+# `build` & `serve` docs path
+out_dir = "docs"
 
 # resource (public) file folder
 asset_dir = "public"
