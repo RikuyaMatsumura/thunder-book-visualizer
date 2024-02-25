@@ -65,6 +65,7 @@ pub(crate) fn alternate_maze_state(cx: Scope) -> Element {
                 button {
                     class: "m-2 text-white bg-blue-500 border-0 rounded py-1 px-4 focus:outline-none hover:bg-gray-300",
                     onclick: move |_| {
+                        turn.set(0);
                         states.set(CalcedState::new(input_data.to_string(), output_data.to_string()));
                     },
                     "init"
@@ -124,7 +125,7 @@ pub(crate) fn alternate_maze_state(cx: Scope) -> Element {
                                 "{h*3+w}"
                             }
                             p {
-                                class: "text-center",
+                                class: "text-5xl text-center",
                                 "{states.get_grid_hw(turn.to_string(), h, w)}"
                             }
                         }
