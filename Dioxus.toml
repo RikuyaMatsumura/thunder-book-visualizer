@@ -18,7 +18,7 @@ asset_dir = "public"
 # HTML title tag content
 title = "thunder-book-visualizer"
 
-base_path = "thunder-book-visualizer/docs"
+base_path = "thunder-book-visualizer"
 
 [web.watcher]
 
