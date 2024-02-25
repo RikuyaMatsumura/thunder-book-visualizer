@@ -19,3 +19,9 @@ dx serve --hot-reload
 ```
 
 - Open the browser to http://localhost:8080.
+
+## リリースビルド
+
+```bash
+dx build --release
+```

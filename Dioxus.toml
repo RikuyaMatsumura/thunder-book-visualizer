@@ -16,7 +16,9 @@ asset_dir = "public"
 [web.app]
 
 # HTML title tag content
-title = "dioxus | ⛺"
+title = "thunder-book-visualizer"
+
+base_path = "thunder-book-visualizer"
 
 [web.watcher]
 
