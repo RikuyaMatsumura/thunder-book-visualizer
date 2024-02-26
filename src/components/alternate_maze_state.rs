@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use std::mem::swap;
 
 const MOVE_YX: [(isize, isize); 4] = [(0, 1), (0, -1), (1, 0), (-1, 0)];
 
@@ -52,8 +53,7 @@ pub(crate) fn alternate_maze_state(cx: Scope) -> Element {
                     class: "block m-2 text-sm font-medium text-gray-900 dark:text-white",
                     "output"
                 }
-                textarea {
-                    rows: 4,
+                input {
                     class: "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500",
                     value: "{output_data}",
                     oninput: move |evt| {
@@ -101,6 +101,12 @@ pub(crate) fn alternate_maze_state(cx: Scope) -> Element {
                         },
                         "Next"
                     }
+                }
+            }
+            li {
+                p {
+                    class: "block m-2 font-medium text-gray-900 dark:text-white",
+                    "ゲームの状況: {states.get_winning_status(turn.to_string())}"
                 }
             }
             li {
@@ -283,53 +289,6 @@ impl AlternateMazeState {
         }
         return result;
     }
-
-    fn to_string(&self) -> String {
-        let mut result = String::new();
-        result.push_str(&format!("turn: {}\n", self.turn));
-        for i in 0..self.characters.len() {
-            let mut actual_player_id = i;
-            if self.turn % 2 == 1 {
-                actual_player_id ^= 1;
-            }
-            result.push_str(&format!(
-                "score({}): {}, y: {}, x: {}\n",
-                i,
-                self.characters[actual_player_id].game_score,
-                self.characters[actual_player_id].y,
-                self.characters[actual_player_id].x
-            ));
-        }
-
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
-                let mut is_written = false;
-                for i in 0..self.characters.len() {
-                    let mut actual_player_id = i;
-                    if self.turn % 2 == 1 {
-                        actual_player_id ^= 1;
-                    }
-                    if self.characters[i].y == h && self.characters[i].x == w {
-                        if actual_player_id == 0 {
-                            result.push_str("A");
-                        } else {
-                            result.push_str("B");
-                        }
-                        is_written = true;
-                    }
-                }
-                if !is_written {
-                    if self.points[h][w] > 0 {
-                        result.push_str(&self.points[h][w].to_string());
-                    } else {
-                        result.push_str(".");
-                    }
-                }
-            }
-            result.push_str("\n");
-        }
-        return result;
-    }
 }
 
 struct CalcedState {
@@ -368,27 +327,26 @@ impl CalcedState {
         CalcedState { states }
     }
 
-    fn get_score(&self, turn: String, player_id: usize) -> u32 {
-        if turn.parse::<usize>().is_err() {
-            return u32::MIN;
+    fn get_winning_status(&self, turn: String) -> String {
+        let turn = turn.parse::<usize>().unwrap();
+        let mut turn_player = "A";
+        let mut not_turn_player = "B";
+        if turn % 2 == 1 {
+            swap(&mut turn_player, &mut not_turn_player);
         }
+        return match self.states[turn].get_winning_status() {
+            WinningStatue::Win => turn_player.to_string() + "の勝ち",
+            WinningStatue::Lose => not_turn_player.to_string() + "の勝ち",
+            WinningStatue::Draw => "引き分け".to_string(),
+            WinningStatue::None => "進行中".to_string(),
+        };
+    }
 
-        let turn: usize = turn.parse().unwrap();
-        if turn >= self.states.len() {
-            return u32::MIN;
-        }
-        return self.states[turn].get_score(player_id);
+    fn get_score(&self, turn: String, player_id: usize) -> u32 {
+        return self.states[turn.parse::<usize>().unwrap()].get_score(player_id);
     }
 
     fn get_grid_hw(&self, turn: String, h: usize, w: usize) -> String {
-        if turn.parse::<usize>().is_err() {
-            return "incorrect turn".to_string();
-        }
-
-        let turn: usize = turn.parse().unwrap();
-        if turn >= self.states.len() {
-            return "incorrect turn".to_string();
-        }
-        return self.states[turn].get_grid_hw(h, w);
+        return self.states[turn.parse::<usize>().unwrap()].get_grid_hw(h, w);
     }
 }
