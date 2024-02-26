@@ -8,11 +8,11 @@ const WIDTH: usize = 3;
 const END_TURN: usize = 4;
 
 pub(crate) fn alternate_maze_state(cx: Scope) -> Element {
-    let input_data = use_state(cx, || "554\n070\n961".to_string());
+    let input_data = use_state(cx, || "554\nA7B\n961".to_string());
     let output_data = use_state(cx, || "RUUD".to_string());
     let mut turn = use_state(cx, || 0);
     let states = use_state(cx, || {
-        CalcedState::new("554\n070\n961".to_string(), "RUUD".to_string())
+        CalcedState::new("554\nA7B\n961".to_string(), "RUUD".to_string())
     });
     log::info!("input_data: {}", input_data);
     log::info!("output_data: {}", output_data);
@@ -174,35 +174,38 @@ struct AlternateMazeState {
 }
 
 impl AlternateMazeState {
-    fn new(points: [[u32; WIDTH]; HEIGHT]) -> Self {
+    fn new(points: [[u32; WIDTH]; HEIGHT], characters: [Character; 2]) -> Self {
         AlternateMazeState {
             points,
-            characters: [
-                Character::new(HEIGHT / 2, WIDTH / 2 - 1),
-                Character::new(HEIGHT / 2, WIDTH / 2 + 1),
-            ],
+            characters,
             turn: 0,
         }
     }
 
-    fn init(mut input: String) -> Self {
+    fn init(mut init_data: String) -> Self {
         let mut points = [[0; WIDTH]; HEIGHT];
+        let mut characters = [
+            Character::new(HEIGHT / 2, WIDTH / 2 - 1),
+            Character::new(HEIGHT / 2, WIDTH / 2 + 1),
+        ];
         let mut now_h = 0;
         let mut now_w = 0;
-        while input.len() > 0 {
-            let c = input.remove(0);
-            if c.to_digit(10).is_none() {
+        while init_data.len() > 0 {
+            let c = init_data.remove(0);
+            if c != 'A' && c != 'B' && c.to_digit(10).is_none() {
                 continue;
             }
 
-            let mut num = c.to_digit(10).unwrap();
-            if now_h == HEIGHT / 2 && now_w == WIDTH / 2 - 1 {
-                num = 0;
+            if c == 'A' {
+                characters[0].y = now_h;
+                characters[0].x = now_w;
+            } else if c == 'B' {
+                characters[1].y = now_h;
+                characters[1].x = now_w;
+            } else {
+                points[now_h][now_w] = c.to_digit(10).unwrap();
             }
-            if now_h == HEIGHT / 2 && now_w == WIDTH / 2 + 1 {
-                num = 0;
-            }
-            points[now_h][now_w] = num;
+
             now_w += 1;
             if now_w == WIDTH {
                 now_w = 0;
@@ -212,7 +215,7 @@ impl AlternateMazeState {
                 break;
             }
         }
-        return AlternateMazeState::new(points);
+        return AlternateMazeState::new(points, characters);
     }
 
     fn is_done(&self) -> bool {
@@ -296,8 +299,8 @@ struct CalcedState {
 }
 
 impl CalcedState {
-    fn new(points: String, mut moves: String) -> Self {
-        let mut now_state = AlternateMazeState::init(points);
+    fn new(init_data: String, mut moves: String) -> Self {
+        let mut now_state = AlternateMazeState::init(init_data);
         let mut states = vec![now_state.clone(); END_TURN + 1];
 
         while !now_state.is_done() && moves.len() > 0 {
