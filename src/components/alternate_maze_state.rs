@@ -125,15 +125,9 @@ pub(crate) fn alternate_maze_state(cx: Scope) -> Element {
                 class: "grid p-5 grid-cols-3 gap-1",
                 for h in 0..HEIGHT {
                     for w in 0..WIDTH {
-                        div {
-                            class: "size-40 bg-green-100",
-                            p {
-                                "{h*3+w}"
-                            }
-                            p {
-                                class: "text-5xl text-center",
-                                "{states.get_grid_hw(turn.to_string(), h, w)}"
-                            }
+                        p {
+                            class: "size-32 bg-green-100 text-5xl flex items-center justify-center",
+                            "{states.get_grid_hw(turn.to_string(), h, w)}"
                         }
                     }
                 }
