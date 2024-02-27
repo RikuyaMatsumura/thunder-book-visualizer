@@ -341,7 +341,7 @@ impl CalcedState {
             WinningStatue::Win => turn_player.to_string() + "の勝ち",
             WinningStatue::Lose => not_turn_player.to_string() + "の勝ち",
             WinningStatue::Draw => "引き分け".to_string(),
-            WinningStatue::None => "進行中".to_string(),
+            WinningStatue::None => "残り".to_string() + &(END_TURN - turn).to_string() + "ターン",
         };
     }
 
